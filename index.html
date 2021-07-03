@@ -1,21 +1,32 @@
 <html>
   <head>
-    <title>Garoa Hacker Clube - Pagamento de mensalidade de associado 2021/2022 via Paypal</title>
+    <title>Garoa Hacker Clube - Pagamento de Mensalidade de Associado (R$ 176)</title>
   </head>
   <body>
     <h1>Garoa Hacker Clube - Pagamento de mensalidade de associado</h1>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-      <input type="hidden" name="cmd" value="_s-xclick">
-      <input type="hidden" name="hosted_button_id" value="SFWHVQ9KY2KJL">
-      <table>
-        <tr><td><input type="hidden" name="on0" value=""></td></tr><tr><td><select name="os0">
-        <option value="associado do Garoa">associado do Garoa : R$176,00 BRL - mensalmente</option>
-        <option value="amigo do Garoa">amigo do Garoa : R$50,00 BRL - mensalmente</option>
-      </select> </td></tr>
-    </table>
-    <input type="hidden" name="currency_code" value="BRL">
-    <input type="image" src="https://www.paypalobjects.com/pt_BR/BR/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - A maneira fácil e segura de enviar pagamentos online!">
-    <img alt="" border="0" src="https://www.paypalobjects.com/pt_BR/i/scr/pixel.gif" width="1" height="1">
-  </form>
+
+    <p>Para pagar a mensalidade de associado do Garoa Hacker Clube de forma recorrente no valor de R$ 176 reais pelo PayPal clique no botão a seguir</p>
+
+    <div id="paypal-button-container-P-9TP3259813133982JMDPFP3Y"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXSxP9Cgc2oVyxVUyUX4SX7klY5suR_MBgfsMFsJAgNIwyGtzR-HfERpW5ZAH_5XvE-CgZRj-8OUTCnD&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+    <script>
+      paypal.Buttons({
+          style: {
+              shape: 'rect',
+              color: 'gold',
+              layout: 'vertical',
+              label: 'subscribe'
+          },
+          createSubscription: function(data, actions) {
+            return actions.subscription.create({
+              /* Creates the subscription */
+              plan_id: 'P-9TP3259813133982JMDPFP3Y'
+            });
+          },
+          onApprove: function(data, actions) {
+            alert('Obrigado por contribuir com o Garoa!'); // You can add optional success message for the subscriber here
+          }
+      }).render('#paypal-button-container-P-9TP3259813133982JMDPFP3Y'); // Renders the PayPal button
+    </script>
 </body>
 </html>
