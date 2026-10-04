@@ -1,27 +1,124 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Garoa Hacker Clube - Pagamento de Mensalidade de Associado e Doações</title>
+    <link rel="icon" href="ghc_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --green: #006837;
+        --neon: #00ff00;
+        --ink: #14201a;
+        --muted: #5b6b62;
+        --line: #e3e9e5;
+        --bg: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.6 Inter, system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 64px 20px 48px;
+      }
+      header { text-align: center; margin-bottom: 48px; }
+      header img { width: 120px; height: auto; display: block; margin: 0 auto 28px; }
+      h1 { font-size: 1.5rem; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; }
+      .sub { color: var(--muted); margin: 0; }
+
+      .price {
+        text-align: center;
+        margin: 0 0 40px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+      }
+      .price strong { font-size: 3rem; font-weight: 500; color: var(--green); letter-spacing: -0.02em; }
+      .price span { color: var(--muted); }
+
+      section { padding: 28px 0; border-top: 1px solid var(--line); }
+      h2 {
+        font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+        color: var(--green); margin: 0 0 8px;
+      }
+      section p { margin: 0 0 16px; color: var(--muted); }
+      .tag {
+        margin-left: 6px; padding: 2px 8px; border-radius: 999px;
+        background: var(--green); color: #fff; font-size: 0.7rem; letter-spacing: 0.04em;
+        vertical-align: 1px;
+      }
+
+      .pix {
+        display: flex; align-items: center; gap: 8px;
+        border: 1px solid var(--line); border-radius: 8px; padding: 6px 6px 6px 14px;
+      }
+      .pix code {
+        flex: 1; min-width: 0; overflow-wrap: anywhere;
+        font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.95rem;
+      }
+      .btn {
+        font: inherit; font-weight: 500; cursor: pointer;
+        border: 1px solid var(--green); border-radius: 6px;
+        background: var(--green); color: #fff; padding: 8px 16px;
+        transition: background .15s, color .15s;
+      }
+      .btn:hover { background: #00552d; }
+      .btn.ghost { background: transparent; color: var(--green); }
+      .btn.ghost:hover { background: var(--green); color: #fff; }
+      .btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+
+      footer { border-top: 1px solid var(--line); padding-top: 28px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+      a { color: var(--green); text-underline-offset: 3px; }
+      .rain { display: block; width: 32px; height: 3px; margin: 0 auto 20px; background: radial-gradient(circle, var(--neon) 1.5px, transparent 2px) 0 0 / 8px 3px; }
+    </style>
   </head>
   <body>
-    <h1>Garoa Hacker Clube - Pagamento de mensalidade de associado</h1>
+    <main>
+      <header>
+        <img src="ghc_logo.png" alt="Garoa Hacker Clube">
+        <h1>Mensalidade de associado</h1>
+        <p class="sub">Garoa Hacker Clube</p>
+      </header>
 
-    <p>Para pagar a mensalidade de associado do Garoa Hacker Clube de forma recorrente no valor de <strong>R$ 187</strong> (cento e oitenta e sete reais) pelo PayPal clique no botão a seguir.</p>
+      <p class="price"><strong>R$ 187</strong> <span>/ mês</span></p>
 
-    <div id="paypal-button-container-P-9TP3259813133982JMDPFP3Y"></div>
-    
-    <p>Caso prefira doar um valor mensal, clique no botão doar abaixo.</p>
-    
-    <form action="https://www.paypal.com/donate" method="post" target="_top">
-      <input type="hidden" name="hosted_button_id" value="TPPZB2LQJDV2S" />
-      <input type="image" src="https://www.paypalobjects.com/pt_BR/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Faça doações com o botão do PayPal" />
-      <img alt="" border="0" src="https://www.paypal.com/pt_BR/i/scr/pixel.gif" width="1" height="1" />
-    </form>
-    
-    <p>Se quiser fazer um pix para o garoa nossa chave é o email: <strong>pagamentos@garoa.net.br</strong>
+      <section>
+        <h2>Pix <span class="tag">preferencial</span></h2>
+        <p>Prefira o Pix: não há taxas, então o valor chega integralmente ao Garoa. Nossa chave é o email:</p>
+        <div class="pix">
+          <code id="pix-key">pagamentos@garoa.net.br</code>
+          <button type="button" class="btn ghost" id="copy-pix">Copiar</button>
+        </div>
+      </section>
 
+      <section>
+        <h2>Assinatura recorrente</h2>
+        <p>Pague a mensalidade de <strong>R$ 187</strong> (cento e oitenta e sete reais) todo mês pelo PayPal.</p>
+        <div id="paypal-button-container-P-9TP3259813133982JMDPFP3Y"></div>
+      </section>
 
-    <p>Ou acesse a página de <a href="https://garoa.net.br/wiki/Mensalidades">mensalidades na Wiki do Garoa</a> para saber mais.</p>
-         
+      <section>
+        <h2>Doação</h2>
+        <p>Prefere doar outro valor? Faça uma doação pelo PayPal.</p>
+        <form action="https://www.paypal.com/donate" method="post" target="_top">
+          <input type="hidden" name="hosted_button_id" value="TPPZB2LQJDV2S" />
+          <button type="submit" class="btn ghost">Doar com PayPal</button>
+        </form>
+      </section>
+
+      <footer>
+        <span class="rain" aria-hidden="true"></span>
+        Saiba mais na página de <a href="https://garoa.net.br/wiki/Mensalidades">mensalidades na Wiki do Garoa</a>.
+      </footer>
+    </main>
+
     <script src="https://www.paypal.com/sdk/js?client-id=AXSxP9Cgc2oVyxVUyUX4SX7klY5suR_MBgfsMFsJAgNIwyGtzR-HfERpW5ZAH_5XvE-CgZRj-8OUTCnD&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
     <script>
       paypal.Buttons({
@@ -41,6 +138,14 @@
             alert('Obrigado por contribuir com o Garoa!'); // You can add optional success message for the subscriber here
           }
       }).render('#paypal-button-container-P-9TP3259813133982JMDPFP3Y'); // Renders the PayPal button
+
+      document.getElementById('copy-pix').addEventListener('click', function () {
+        var btn = this;
+        navigator.clipboard.writeText(document.getElementById('pix-key').textContent).then(function () {
+          btn.textContent = 'Copiado!';
+          setTimeout(function () { btn.textContent = 'Copiar'; }, 2000);
+        });
+      });
     </script>
-</body>
+  </body>
 </html>
