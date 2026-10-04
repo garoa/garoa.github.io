@@ -1,0 +1,8 @@
+# Planilhas de prestação de contas (dados brutos, não publicar)
+*.csv
+*.xlsx
+
+# Sistema / Python
+.DS_Store
+__pycache__/
+.venv/
