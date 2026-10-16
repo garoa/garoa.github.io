@@ -1,7 +1,7 @@
 // Gerado por scripts/extrair.py — apenas valores agregados por categoria.
 window.DADOS = {
   "ano": 2026,
-  "atualizadoEm": "2026-10-04",
+  "atualizadoEm": "2026-10-16",
   "saldoInicialConta": 5032.47,
   "saldoInicialInvestimentos": 30423.51,
   "meses": [
@@ -83,8 +83,9 @@ window.DADOS = {
       "despesas": {
         "Luz": 120.98,
         "Aluguel": 4260.01,
-        "Outros": 800.09,
-        "Internet": 113.19
+        "Seguro": 64.85,
+        "Internet": 113.19,
+        "Outros": 735.24
       },
       "investimento": 0.0,
       "receitaExtraordinaria": 0.0,
@@ -206,13 +207,31 @@ window.DADOS = {
       "saldoInvestimentos": 29977.07,
       "saldoInvestimentosLiquido": 29247.86,
       "observacao": ""
+    },
+    {
+      "mes": "2026-10",
+      "parcial": true,
+      "ate": "2026-10-03",
+      "receitas": {
+        "Mensalidades (PayPal)": 354.88,
+        "Mensalidades (depósito)": 374.0,
+        "Anuidades": 3148.0
+      },
+      "despesas": {
+        "Aluguel": 4290.27
+      },
+      "investimento": 0.0,
+      "receitaExtraordinaria": 0.0,
+      "saldoConta": 4945.41,
+      "saldoInvestimentos": null,
+      "saldoInvestimentosLiquido": null,
+      "observacao": ""
     }
   ],
   "projecao": [
     {
       "mes": "2026-10",
       "despesas": {
-        "Aluguel": 4290.27,
         "Contabilidade": 398.2,
         "Luz": 126.83,
         "Água": 81.24,
@@ -240,6 +259,16 @@ window.DADOS = {
       }
     }
   ],
+  "contasJaneiro": {
+    "mes": "2027-01",
+    "despesas": {
+      "Aluguel": 3860.6,
+      "Contabilidade": 398.2,
+      "Luz": 126.83,
+      "Água": 81.24,
+      "Internet": 113.19
+    }
+  },
   "previsaoReceitas": {
     "mensal": {
       "Mensalidades (depósito)": 1095.33,
@@ -252,6 +281,122 @@ window.DADOS = {
       "2026-08",
       "2026-09"
     ],
-    "anuidadesConfirmadas": 3148.0
+    "anuidadesConfirmadas": 0.0,
+    "cenarios": {
+      "pessimista": {
+        "Mensalidades (depósito)": 962.0,
+        "Mensalidades (PayPal)": 532.32,
+        "Apoia-se": 445.44,
+        "Doações, eventos e lojinha": 0.0
+      },
+      "otimista": {
+        "Mensalidades (depósito)": 1162.0,
+        "Mensalidades (PayPal)": 1065.25,
+        "Apoia-se": 445.44,
+        "Doações, eventos e lojinha": 578.98
+      }
+    },
+    "restanteParcial": {
+      "pessimista": {
+        "Mensalidades (depósito)": 588.0,
+        "Mensalidades (PayPal)": 177.44,
+        "Apoia-se": 445.44,
+        "Doações, eventos e lojinha": 0.0
+      },
+      "otimista": {
+        "Mensalidades (depósito)": 788.0,
+        "Mensalidades (PayPal)": 710.37,
+        "Apoia-se": 445.44,
+        "Doações, eventos e lojinha": 578.98
+      }
+    }
+  },
+  "badge": {
+    "lote": 30,
+    "unidadesPagasPeloClube": 20,
+    "custoUnidade": 87.7655,
+    "frete": 0.1,
+    "preco": 150.0,
+    "taxaCartao": 0.05,
+    "eventos": [
+      "GambiConf",
+      "307"
+    ],
+    "vendas": {
+      "pessimista": {
+        "GambiConf": 4,
+        "307": 8
+      },
+      "otimista": {
+        "GambiConf": 10,
+        "307": 20
+      }
+    },
+    "componentes": 1755.31,
+    "custoClube": 1930.84,
+    "precoLiquido": 142.5,
+    "receita": {
+      "pessimista": 1710.0,
+      "otimista": 4275.0
+    }
+  },
+  "extratos": {
+    "conferidos": {
+      "conta": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ],
+      "investimentos": [
+        "2026-01",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08",
+        "2026-09"
+      ]
+    },
+    "dinheiroParado": {
+      "colchao": 6000.0,
+      "maiorNecessidade": 4888.79,
+      "mesMaiorNecessidade": "2026-05",
+      "saldoMedio": 12941.18,
+      "perdaBruta": 761.28,
+      "perdaLiquida": 589.99,
+      "taxaDiaUtil": 0.0005165470997377588,
+      "de": "2026-01",
+      "ate": "2026-09"
+    },
+    "aluguelAtrasado": [
+      {
+        "mes": "2026-09",
+        "dia": 15,
+        "pago": 4724.97,
+        "boleto": 4290.27,
+        "extra": 434.7
+      }
+    ],
+    "rendimento": {
+      "2026-01": 385.0,
+      "2026-04": 221.74,
+      "2026-05": 242.87,
+      "2026-06": 287.56,
+      "2026-07": 414.1,
+      "2026-08": 377.42,
+      "2026-09": 360.47
+    },
+    "irRetido": 216.58,
+    "mercadoPago": {
+      "mes": "2026-09",
+      "saldo": 64.93,
+      "saldoInicial": 100.17
+    }
   }
 };

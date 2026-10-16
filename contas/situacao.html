@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Contas do Garoa</title>
+<!-- Resumo em imagem para mandar no Telegram. Gerar o PNG (na pasta contas/):
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
+    --allow-file-access-from-files --virtual-time-budget=4000 --window-size=1080,2430 \
+    --screenshot=assets/situacao-2026-10.png "file://$PWD/situacao.html" -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #eef6f0; --surface: #ffffff; --ink: #14201a; --ink-2: #48564e; --muted: #5b6b62;
+  --grid: #e3e9e5; --axis: #b8c4bd;
+  --verde: #006837; --despesa: #c4471f; --invest: #a87a0a; --neg: #b23a17;
+  --marker: rgba(0,255,0,0.42); --marker-neg: rgba(255,70,30,0.26);
+}
+* { box-sizing: border-box; margin: 0; }
+body { width: 1080px; background: var(--page); color: var(--ink); font-family: Inter, system-ui, sans-serif; padding: 56px 60px 48px; }
+.mono { font-family: "JetBrains Mono", monospace; letter-spacing: -0.03em; }
+header { display: flex; align-items: center; gap: 22px; border-bottom: 3px solid var(--ink); padding-bottom: 24px; }
+header img { width: 84px; height: 84px; }
+h1 { font-size: 44px; font-weight: 800; letter-spacing: -0.02em; }
+header p { font-size: 22px; color: var(--ink-2); margin-top: 4px; }
+section { background: var(--surface); border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 30px 34px; margin-top: 34px; }
+h2 { font-size: 30px; font-weight: 700; }
+.sub { font-size: 20px; color: var(--ink-2); margin-top: 6px; line-height: 1.4; }
+.hoje { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 20px; }
+.lbl { font: 500 16px "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); display: flex; align-items: center; gap: 10px; }
+.sw { width: 14px; height: 14px; display: inline-block; }
+.val { font: 700 50px "JetBrains Mono", monospace; letter-spacing: -0.04em; margin-top: 6px; }
+.nota { font-size: 18px; color: var(--muted); margin-top: 2px; }
+.ok { margin-top: 22px; font-size: 21px; padding: 14px 18px; border-left: 4px solid var(--verde); background: rgba(0,104,55,0.06); line-height: 1.4; }
+svg text { font-family: Inter, system-ui, sans-serif; fill: var(--ink-2); }
+svg .v { font-family: "JetBrains Mono", monospace; font-weight: 700; fill: var(--ink); }
+.big { font: 700 64px "JetBrains Mono", monospace; letter-spacing: -0.04em; display: inline; background: linear-gradient(transparent 52%, var(--marker-neg) 52%, var(--marker-neg) 94%, transparent 94%); color: var(--neg); }
+.meta { margin-top: 14px; }
+.per { font-size: 22px; color: var(--ink-2); margin-top: 8px; }
+.track { height: 26px; background: var(--grid); margin-top: 18px; position: relative; }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--invest); }
+.ticks { display: flex; justify-content: space-between; font: 500 17px "JetBrains Mono", monospace; color: var(--muted); margin-top: 8px; }
+.ajude { margin-top: 34px; background: var(--ink); color: #fff; padding: 28px 34px; }
+.ajude h2 { color: #fff; }
+.ajude ul { margin-top: 12px; padding-left: 26px; font-size: 22px; line-height: 1.6; }
+.ajude .pix { margin-top: 14px; font-size: 22px; }
+.ajude .pix b { font-family: "JetBrains Mono", monospace; background: rgba(0,255,0,0.25); padding: 2px 8px; }
+footer { margin-top: 20px; font-size: 16px; color: var(--muted); }
+.link { margin-top: 26px; font-size: 22px; color: var(--ink-2); }
+.link b { font-family: "JetBrains Mono", monospace; color: var(--verde); }
+</style>
+</head>
+<body>
+<header>
+  <img src="assets/garoa-logo.svg" alt="">
+  <div><h1>Contas do Garoa</h1><p id="quando"></p></div>
+</header>
+
+<section>
+  <h2>Hoje temos</h2>
+  <div class="hoje">
+    <div><div class="lbl"><i class="sw" style="background:var(--verde)"></i>Conta corrente</div><div class="val" id="conta"></div><div class="nota" id="conta-n"></div></div>
+    <div><div class="lbl"><i class="sw" style="background:var(--invest)"></i>Investimentos</div><div class="val" id="inv"></div><div class="nota" id="inv-n"></div></div>
+  </div>
+  <div class="ok" id="ok"></div>
+</section>
+
+<section>
+  <h2>Até janeiro, sem mexer nos investimentos</h2>
+  <p class="sub">O que sai da conta até dezembro, mais as contas de janeiro (as anuidades só entram em fevereiro).</p>
+  <svg id="cascata" width="884" height="470"></svg>
+  <div class="meta"><span class="big" id="falta"></span></div>
+  <p class="per" id="falta-per"></p>
+  <svg id="cenarios" width="884" height="250" style="margin-top:22px"></svg>
+</section>
+
+<section>
+  <h2>Reserva de 6 meses de despesas</h2>
+  <p class="per" id="res-per"></p>
+  <div class="track"><div class="fill" id="res-fill"></div></div>
+  <div class="ticks"><span>R$ 0</span><span id="res-meta"></span></div>
+</section>
+
+<div class="ajude">
+  <h2>Como ajudar</h2>
+  <ul>
+    <li>Mensalidade em dia (ou adiantada)</li>
+    <li>Anuidade: paga o ano todo de uma vez</li>
+    <li>Doação, Apoia-se e a badge na GambiConf e na 307</li>
+    <li>Comprar componentes para a badge (planilha no link da mensagem)</li>
+    <li>Lojinha: livros do Ramalho e garrafinhas</li>
+  </ul>
+  <p class="pix">Pix: <b>pagamentos@garoa.net.br</b> · garoa.net.br/wiki/Mensalidades</p>
+</div>
+<p class="link">Prestação de contas completa: <b>garoa.github.io/contas</b></p>
+<footer id="rodape"></footer>
+
+<script src="dados.js"></script>
+<script>
+const D = window.DADOS;
+const soma = o => Object.values(o).reduce((a, b) => a + b, 0);
+const brl = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const $ = id => document.getElementById(id);
+const NOMES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const MESES = D.meses, ult = MESES[MESES.length - 1], PARC = MESES.find(m => m.parcial);
+const ate = new Date((PARC ? PARC.ate : D.atualizadoEm) + "T12:00").toLocaleDateString("pt-BR");
+const fech = MESES.filter(m => !m.parcial);
+const mediaDesp = fech.reduce((a, m) => a + soma(m.despesas), 0) / fech.length;
+const liq = [...MESES].reverse().find(m => m.saldoInvestimentosLiquido != null);
+
+$("quando").textContent = `Situação em ${ate} · prestação de contas ${D.ano}`;
+$("conta").textContent = brl(ult.saldoConta);
+$("conta-n").textContent = `saldo em ${ate}`;
+$("inv").textContent = brl(liq.saldoInvestimentosLiquido);
+$("inv-n").textContent = `líquido de IR, fim de ${NOMES[+liq.mes.slice(5) - 1]}`;
+
+const PROJ = D.projecao, JAN = D.contasJaneiro;
+const nov = PROJ.find(p => p.mes.endsWith("-11"));
+const restoOut = PROJ[0];
+const fimOut = ult.saldoConta - soma(restoOut.despesas);
+$("ok").innerHTML = `✔ Aluguel de outubro pago. As contas de novembro (${brl(soma(nov.despesas))}) já estão cobertas pelo que está na conta.`;
+
+// ---- Cascata
+const passos = [
+  { k: "Na conta hoje", v: ult.saldoConta, tipo: "ini" },
+  ...PROJ.map((p, i) => ({ k: i === 0 && PARC ? "resto de out" : NOMES[+p.mes.slice(5) - 1], v: -soma(p.despesas) })),
+  { k: "contas de jan", v: -soma(JAN.despesas) },
+];
+let acc = 0;
+passos.forEach(p => { p.a = acc; acc += p.v; p.b = acc; });
+passos.push({ k: "Falta", a: 0, b: acc, v: acc, tipo: "fim" });
+const falta = -acc;
+{
+  const svg = $("cascata"), W = 884, H = 470, m = { t: 44, b: 70, l: 0, r: 0 };
+  const lo = -12000, hi = 6000, ih = H - m.t - m.b;
+  const y = v => m.t + (hi - v) / (hi - lo) * ih;
+  const band = W / passos.length, bw = band * 0.62;
+  let h = "";
+  for (let v = lo; v <= hi; v += 3000)
+    h += `<line x1="0" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="${v === 0 ? "#14201a" : "#e3e9e5"}" stroke-width="${v === 0 ? 2 : 1}"/>`;
+
+  passos.forEach((p, i) => {
+    const x = i * band + (band - bw) / 2, top = y(Math.max(p.a, p.b)), bot = y(Math.min(p.a, p.b));
+    const cor = p.tipo === "ini" ? "#006837" : p.tipo === "fim" ? "#b23a17" : "#c4471f";
+    h += `<rect x="${x}" y="${top}" width="${bw}" height="${Math.max(2, bot - top)}" fill="${cor}" ${p.tipo === "fim" ? "" : 'opacity="0.9"'}/>`;
+    if (i < passos.length - 1) h += `<line x1="${x + bw}" x2="${x + band}" y1="${y(p.b)}" y2="${y(p.b)}" stroke="#48564e" stroke-dasharray="4 4"/>`;
+    const neg = p.v < 0;
+    const ly = neg ? bot + 28 : top - 12;
+    h += `<text class="v" x="${x + bw / 2}" y="${ly}" text-anchor="middle" font-size="20">${neg ? "−" : "+"}${brl(Math.abs(p.v)).replace("R$", "").trim()}</text>`;
+    h += `<text x="${x + bw / 2}" y="${H - 22}" text-anchor="middle" font-size="18" font-weight="${p.tipo ? 700 : 500}" fill="#14201a">${p.k}</text>`;
+  });
+  svg.innerHTML = h;
+}
+$("falta").textContent = `Faltam ${brl(falta)}`;
+const restam = 12 - fech.length;
+$("falta-per").textContent = `≈ ${brl(falta / restam)} por mês até dezembro. O que deve entrar de mensalidades, Apoia-se, doações e badge:`;
+
+// ---- Cenários
+{
+  const PR = D.previsaoReceitas, B = D.badge;
+  const inteiros = 12 - MESES.length;
+  const rec = c => soma(PR.cenarios[c]) * inteiros + (PR.restanteParcial ? soma(PR.restanteParcial[c]) : 0)
+    + PR.anuidadesConfirmadas + (B ? B.receita[c] - B.custoClube : 0);
+  const linhas = [["Pessimista", rec("pessimista")], ["Otimista", rec("otimista")]];
+  const svg = $("cenarios"), W = 884, lx = 170, max = 12000, x = v => lx + v / max * (W - lx - 10);
+  let h = "";
+  linhas.forEach(([k, v], i) => {
+    const yy = 30 + i * 100, d = v - falta;
+    h += `<text x="0" y="${yy + 30}" font-size="22" font-weight="700" fill="#14201a">${k}</text>`;
+    h += `<rect x="${lx}" y="${yy}" width="${x(v) - lx}" height="44" fill="#006837"/>`;
+    h += `<text class="v" x="${lx + 14}" y="${yy + 30}" font-size="20" style="fill:#fff">${brl(v)}</text>`;
+    h += `<text x="${lx}" y="${yy + 74}" font-size="19" style="fill:${d < 0 ? "#b23a17" : "#006837"}" font-weight="700">${d < 0 ? `faltam ${brl(-d)}: sai dos investimentos` : `sobram ${brl(d)}`}</text>`;
+  });
+  h += `<line x1="${x(falta)}" x2="${x(falta)}" y1="8" y2="${250}" stroke="#b23a17" stroke-width="3" stroke-dasharray="8 5"/>`;
+  h += `<text x="${x(falta) - 8}" y="20" text-anchor="end" font-size="17" font-weight="700" style="fill:#b23a17">precisa: ${brl(falta)}</text>`;
+  svg.innerHTML = h;
+}
+
+// ---- Reserva
+const meta = mediaDesp * 6, tem = liq.saldoInvestimentosLiquido;
+$("res-per").innerHTML = `Meta: ${brl(meta)} (6 × ${brl(mediaDesp)}). Temos <b>${Math.round(tem / meta * 100)}%</b>, faltam <b>${brl(meta - tem)}</b>.`;
+$("res-fill").style.width = Math.min(100, tem / meta * 100) + "%";
+$("res-meta").textContent = brl(meta);
+$("rodape").textContent = `Previsões: mensalidades pelo menor (pessimista) e maior (otimista) valor de jul–set; pessimista sem doações e com venda fraca da badge. Atualizado em ${new Date(D.atualizadoEm + "T12:00").toLocaleDateString("pt-BR")}.`;
+</script>
+</body>
+</html>
