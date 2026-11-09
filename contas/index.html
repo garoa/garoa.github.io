@@ -586,7 +586,7 @@ footer {
       <li>“Doações, eventos e lojinha” junta as doações avulsas, as vendas da lojinha do espaço e as doações recebidas em eventos (BSides, oficinas).</li>
       <li><strong>Quanto falta arrecadar</strong>: despesas já pagas no ano + despesas previstas até dezembro − tudo o que já entrou. É o que precisa entrar até dezembro para o ano fechar sem tirar dinheiro do caixa ou dos investimentos. Na previsão, o aluguel usa o valor do boleto (o IPTU de R$ 429,67 vem até novembro; dezembro é só o aluguel), a contabilidade usa o honorário fixo, água e internet usam o último valor pago, e luz usa a média mensal. Impostos e gastos eventuais não entram, então o valor real pode ser um pouco maior.</li>
       <li><strong>Fechamento previsto</strong>: dois cenários. No <strong>pessimista</strong>, cada mensalidade (depósito, PayPal e Apoia-se) usa o menor valor dos últimos 3 meses e doações não entram. No <strong>otimista</strong>, cada mensalidade usa o maior valor dos últimos 3 meses (os máximos podem ser de meses diferentes) e doações e lojinha usam a média do ano sem o BSides, que foi pontual. Anuidades entram só quando já foram pagas.</li>
-      <li><strong>Badge</strong>: lote de 30 vendido a R$ 150 na GambiConf e na 307, descontando 5% de taxa para quem pagar no cartão. Os componentes de 10 badges foram doados; o clube paga os das outras 20 (custo da lista de materiais, com PCB, + 10% de frete e embalagem) e fica com a receita de todas as vendidas. Pessimista: 12 vendidas (4 + 8). Otimista: 30 (10 + 20).</li>
+      <li><strong>Badge</strong>: lote de 30 vendido a R$ 180 na GambiConf e na 307, descontando 5% de taxa para quem pagar no cartão. Os componentes de 10 badges foram doados; o clube paga os das outras 20 com a verba aprovada de R$ 2.000, que é o custo usado na previsão (a estimativa pela lista de materiais, com PCB e 10% de frete e embalagem, cabe nela), e fica com a receita de todas as vendidas. Pessimista: 12 vendidas (4 + 8). Otimista: 30 (10 + 20).</li>
       <li><strong>Fundo de reserva</strong>: comparado com o saldo líquido dos investimentos (após IR), que é o valor disponível num resgate.</li>
       <li>Os valores são somados por categoria. Esta página não mostra nomes, contas bancárias nem dados de pagamento individuais.</li>
     </ul>
@@ -642,7 +642,7 @@ footer {
   $("ano").textContent = D.ano;
   document.querySelectorAll(".ano").forEach(e => e.textContent = D.ano);
   if (N < 12) { $("selo").textContent = `Parcial · jan–${ABREV[idx(ultimo)]}`; $("selo").hidden = false; }
-  $("lede").textContent = `Quanto o clube recebeu e gastou de ${periodo}. Os números vêm da planilha de tesouraria, somados por categoria.`;
+  $("lede").textContent = `Quanto o clube recebeu e gastou de ${periodo}. Os números vêm da planilha de tesouraria${PARC && PARC.fonte ? ` (${nomeUlt}, do extrato do banco)` : ""}, somados por categoria.`;
   $("k-rec").textContent = brl.format(totRec);
   $("k-rec-n").textContent = `média ${brl.format(mediaRec)}/mês (${faixaFech})`;
   $("k-desp").textContent = brl.format(totDesp);
@@ -825,12 +825,12 @@ footer {
       h += `<div class="grp">Badge (lote de ${B.lote})</div>`;
       h += eventos.map(ev => lin(`Vendas na ${ev}`, CEN.map(c => `${B.vendas[c][ev]} un.`))).join("");
       h += lin(`Receita (${brl.format(B.preco)} − ${pct(B.taxaCartao)} de cartão = ${brl.format(B.precoLiquido)} cada)`, CEN.map(c => "+ " + brl.format(B.receita[c])));
-      h += lin(`Componentes de ${B.unidadesPagasPeloClube} badges + ${pct(B.frete)} de frete`, CEN.map(() => "− " + brl.format(B.custoClube)));
+      h += lin(`Verba aprovada para os componentes de ${B.unidadesPagasPeloClube} badges`, CEN.map(() => "− " + brl.format(B.custoClube)));
       h += lin("Badge (receita − custo)", CEN.map(c => sinal(badgeRes[c])), "sum");
     }
     h += lin(`Receita prevista (${mesesRest})`, CEN.map(c => brl.format(recPrev[c])), "sum");
     h += `<div class="hint">Mensalidades: pessimista usa o menor valor de cada uma em ${baseTxt} e não conta doações; otimista usa o maior valor de cada uma em ${baseTxt} e doações pela média de ${faixaFech} sem o BSides.` +
-      (B ? ` Badge: ${B.lote - B.unidadesPagasPeloClube} das ${B.lote} têm os componentes doados; o clube paga os de ${B.unidadesPagasPeloClube} e fica com a receita de todas as vendidas.` : "") +
+      (B ? ` Badge: ${B.lote - B.unidadesPagasPeloClube} das ${B.lote} têm os componentes doados; o clube paga os de ${B.unidadesPagasPeloClube} (estimativa pela lista de materiais, com ${pct(B.frete)} de frete: ${brl.format(B.custoEstimado)}) e fica com a receita de todas as vendidas.` : "") +
       ` Não conta anuidades futuras nem doações extraordinárias.</div>`;
     $("fc-rec").innerHTML = h;
 

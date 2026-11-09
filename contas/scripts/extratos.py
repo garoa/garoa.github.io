@@ -1,8 +1,12 @@
 """Lê os extratos em PDF da pasta extratos/ (fora do git): conta corrente e investimentos do C6
 e conta do Mercado Pago. O tipo e o mês saem do conteúdo do PDF, não do nome do arquivo.
 
+Também lê o CSV de transações exportado do Conta Aberta (open finance), que cobre vários meses
+da conta corrente. Ele só é usado nos meses sem extrato em PDF (na prática, o mês em andamento).
+
 Senhas: números no nome do arquivo (ex.: 2026-09_141246.pdf) e as linhas de extratos/senhas.txt.
 """
+import csv
 import re
 from pathlib import Path
 
@@ -46,10 +50,18 @@ def texto(arquivo):
 
 
 def conta_c6(t):
-    """Extrato da conta corrente: lançamentos, totais do cabeçalho e saldo informado no dia da exportação."""
-    per = re.search(r"Extrato Período • \d+ de (\w+) de (\d{4})", t)
+    """Extrato da conta corrente: lançamentos, totais do cabeçalho e saldo informado no dia da exportação.
+    Aceita os dois layouts do C6 (até set/2026 "Extrato Período • ...", depois "Período da Exportação")."""
+    per = re.search(r"\( \d\d/(\d\d)/(\d{4}) - (\d\d)/\d\d/\d{4} \) Entradas", t)
     tot = re.search(r"Entradas: " + VALOR + r" • Saídas: " + VALOR, t)
     hoje = re.search(r"Saldo do dia • (\d+) de (\w+) de (\d{4}) • " + VALOR, t)
+    if hoje:
+        hoje = {"data": f"{hoje[3]}-{MESES.index(hoje[2].lower()) + 1:02d}-{int(hoje[1]):02d}",
+                "valor": valor(hoje[4], hoje[5])}
+    else:
+        exp = re.search(r"Exportado em (\d\d)/(\d\d)/(\d\d)", t)
+        sal = re.search(r"\d\d/\d\d/\d{4} a \d\d/\d\d/\d{4} " + VALOR, t)
+        hoje = {"data": f"20{exp[3]}-{exp[2]}-{exp[1]}", "valor": valor(sal[1], sal[2])} if exp and sal else None
     lancamentos = []
     for linha in t.splitlines():
         m = re.match(r"^(\d\d)/(\d\d) \d\d/\d\d (.*?) " + VALOR + "$", linha)
@@ -57,12 +69,13 @@ def conta_c6(t):
             lancamentos.append({"dia": int(m[1]), "mes": int(m[2]), "descricao": m[3], "valor": valor(m[4], m[5])})
     return {
         "tipo": "conta",
-        "mes": f"{per[2]}-{MESES.index(per[1].lower()) + 1:02d}",
+        "mes": f"{per[2]}-{per[1]}",
+        "origem": "extrato do banco",
+        "ate": f"{per[2]}-{per[1]}-{per[3]}",
         "entradas": valor(tot[1], tot[2]),
         "saidas": abs(valor(tot[3], tot[4])),
         "lancamentos": lancamentos,
-        "saldoExportacao": {"data": f"{hoje[3]}-{MESES.index(hoje[2].lower()) + 1:02d}-{int(hoje[1]):02d}",
-                            "valor": valor(hoje[4], hoje[5])} if hoje else None,
+        "saldoExportacao": hoje,
     }
 
 
@@ -106,20 +119,60 @@ def ler(arquivo):
     t = texto(arquivo)
     if "Extrato de Aplicações" in t:
         return investimentos_c6(t)
-    if "Extrato Período" in t:
+    if re.search(r"\) Entradas: R\$", t):
         return conta_c6(t)
     if "mercadopago" in t.lower():
         return mercado_pago(t)
     raise SystemExit(f"{arquivo.name}: tipo de extrato desconhecido")
 
 
-def todos():
-    """{tipo: {mes: extrato}} de todos os PDFs da pasta (inclusive subpastas). Vazio se a pasta não existe."""
+def conta_aberta(arquivo):
+    """CSV do Conta Aberta: {mes: extrato da conta}, no mesmo formato de conta_c6. Não traz saldo."""
+    meses = {}
+    with open(arquivo, encoding="utf-8-sig", newline="") as f:
+        for linha in csv.DictReader(f, delimiter=";"):
+            dia, mes, ano = (int(x) for x in linha["Data"].split("/"))
+            meses.setdefault(f"{ano}-{mes:02d}", []).append(
+                {"dia": dia, "mes": mes, "descricao": linha["Descrição"].strip(), "valor": float(linha["Valor"]),
+                 "categoria": linha["Categoria"].strip()})
     saida = {}
+    for mes, lanc in meses.items():
+        lanc.sort(key=lambda x: x["dia"])
+        saida[mes] = {
+            "tipo": "conta",
+            "mes": mes,
+            "origem": "Conta Aberta",
+            "ate": f"{mes}-{lanc[-1]['dia']:02d}",
+            "entradas": round(sum(x["valor"] for x in lanc if x["valor"] > 0), 2),
+            "saidas": round(-sum(x["valor"] for x in lanc if x["valor"] < 0), 2),
+            "lancamentos": lanc,
+            "saldoExportacao": None,
+        }
+    return saida
+
+
+def eh_conta_aberta(arquivo):
+    return arquivo.suffix.lower() == ".csv" and arquivo.read_bytes()[:40].decode("utf-8-sig", "ignore") \
+        .startswith("Data;Descrição;Tipo;Categoria;Valor")
+
+
+def todos():
+    """{tipo: {mes: extrato}} de todos os PDFs e CSVs do Conta Aberta da pasta (inclusive subpastas).
+    Vazio se a pasta não existe. No mês que tem PDF da conta corrente, o PDF vale e o CSV é ignorado."""
+    saida, csvs = {}, []
     if not PASTA.exists():
         return saida
     for arquivo in sorted(PASTA.rglob("*")):
-        if arquivo.is_file() and arquivo.read_bytes()[:5] == b"%PDF-":  # há PDFs salvos como .jpg
+        if not arquivo.is_file():
+            continue
+        if arquivo.read_bytes()[:5] == b"%PDF-":  # há PDFs salvos como .jpg
             e = ler(arquivo)
             saida.setdefault(e["tipo"], {})[e["mes"]] = e
+        elif eh_conta_aberta(arquivo):
+            csvs.append(arquivo)
+    pdfs = set(saida.get("conta", {}))
+    for arquivo in sorted(csvs, key=lambda a: a.stat().st_mtime):  # o mais recente vale
+        for mes, e in conta_aberta(arquivo).items():
+            if mes not in pdfs:
+                saida.setdefault("conta", {})[mes] = e
     return saida

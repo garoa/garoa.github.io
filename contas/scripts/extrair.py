@@ -5,6 +5,9 @@ Uso (na pasta contas/):
     .venv/bin/python scripts/extrair.py
 
 Para incluir mais meses, acrescente as abas em MESES e rode de novo.
+
+Se houver em extratos/ um extrato da conta corrente (PDF do C6 ou CSV do Conta Aberta) que vá além da
+aba do mês parcial, o mês parcial sai dele (categorias por REGRAS_EXTRATO_*; a classificação de cada lançamento é impressa para revisão).
 """
 import json
 import re
@@ -17,9 +20,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 PLANILHA = RAIZ / "planilhas" / "Garoa HC - Prestação de Contas 2026.xlsx"
 SAIDA = RAIZ / "dados.js"
 ANO = 2026
-MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"]
+MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out"]
 # Mês em andamento (ou None): entram só os lançamentos com data, os sem data ainda não caíram.
-MES_PARCIAL = "Out"
+MES_PARCIAL = "Nov"
 
 # Projeção dos meses que ainda não fecharam (usada em "quanto falta arrecadar").
 # Aluguel: valor conhecido do boleto. IPTU (R$ 429,67) vem de fev a nov, dezembro e janeiro não têm.
@@ -48,12 +51,15 @@ ABAS_SEGUINTES = ["Out", "Nov", "Dez"]  # anuidades pagas adiantadas (depois do 
 # Custo por unidade da lista de materiais (BadgeGaroa_r4.2-ESP32-S3 lista mat, Rev. 0 / 24-09-26),
 # com a PCB pela cotação de 30 placas. O clube paga os componentes de 20; os outros 10 são doados.
 # Itens marcados como "Estoque" na lista não têm custo. Frete e embalagem: +10% sobre o custo.
+# Verba aprovada para os componentes: R$ 2.000. É ela que entra como custo na previsão; a
+# estimativa pela lista de materiais aparece só como referência.
 BADGE = {
     "lote": 30,
     "unidadesPagasPeloClube": 20,
+    "verba": 2000.0,
     "custoUnidade": 87.7655,
     "frete": 0.10,
-    "preco": 150.0,
+    "preco": 180.0,
     "taxaCartao": 0.05,  # supõe que parte das vendas é no crédito/débito
     "eventos": ["GambiConf", "307"],  # ordem de exibição (o JS ordena chaves numéricas primeiro)
     "vendas": {
@@ -80,6 +86,62 @@ REGRAS_DESPESA = [
     (r"bradesco|seguro", "Seguro"),
     (r"cofins|tfe|certificado|imposto|taxa", "Impostos e taxas"),
 ]
+
+# Mês parcial pelo extrato da conta (PDF ou CSV do Conta Aberta, quando ele vai além da planilha). O banco não diz o que é cada Pix,
+# então a categoria sai da descrição e da categoria do banco, e os Pix de pessoas vão pelo valor.
+REGRAS_EXTRATO_RECEITA = [
+    (r"paypal", "Mensalidades (PayPal)"),
+    (r"apoia|cred loj", "Apoia-se"),  # no PDF, o Apoia-se pago no cartão vem como "CRED LOJ"
+]
+VALORES_MENSALIDADE = {187.0, 200.0, 214.0}
+ANUIDADE_MINIMA = 700.0  # Pix de pessoa a partir disso é anuidade (ou parte dela); abaixo, doação
+REGRAS_EXTRATO_DESPESA = [
+    (r"aluguel|transacoes imobiliarias", "Aluguel"),
+    (r"arlete|contabil", "Contabilidade"),
+    (r"enel", "Luz"),
+    (r"sabesp", "Água"),
+    (r"vivo", "Internet"),
+    (r"darf|tributos|receita federal|pm sao paulo", "Impostos e taxas"),
+    (r"seguro", "Seguro"),
+]
+INVESTIMENTO_EXTRATO = r"cdb|aplica[çc][ãa]o|resgate"
+
+
+def parcial_do_extrato(mes):
+    """Extrato da conta corrente do mês parcial, ou None (sem extrato, ou sem pdfplumber para ler a pasta)."""
+    try:
+        import extratos
+        c = extratos.todos().get("conta", {}).get(mes)
+    except ImportError:
+        return None
+    return c
+
+
+def mes_do_extrato(c, saldo_anterior):
+    receitas, despesas = {}, {}
+    investimento = 0.0
+    for x in c["lancamentos"]:
+        texto, v = f"{x['descricao']} {x.get('categoria', '')}", x["valor"]
+        if re.search(INVESTIMENTO_EXTRATO, texto, re.I):
+            investimento += v
+            cat = "Investimento"
+        elif v > 0:
+            cat = classificar(texto, REGRAS_EXTRATO_RECEITA, None) or (
+                "Mensalidades (depósito)" if v in VALORES_MENSALIDADE
+                else "Anuidades" if v >= ANUIDADE_MINIMA else DOACOES)
+            receitas[cat] = round(receitas.get(cat, 0) + v, 2)
+        else:
+            cat = classificar(texto, REGRAS_EXTRATO_DESPESA, "Outros")
+            despesas[cat] = round(despesas.get(cat, 0) - v, 2)
+        print(f"  {x['dia']:02d}/{x['mes']:02d} {v:10.2f}  {cat}")
+    return {
+        "receitas": receitas,
+        "despesas": despesas,
+        "investimento": round(investimento, 2),
+        "saldoConta": round(saldo_anterior + c["entradas"] - c["saidas"], 2),
+        "ate": c["ate"],
+        "fonte": c["origem"],
+    }
 
 
 # "Onde comemos bola" (dos extratos):
@@ -254,6 +316,11 @@ def main():
             "saldoInvestimentosLiquido": num(linha[8]),  # após IR, quando informado
             "observacao": linha[9] or "",
         })
+        if parcial:
+            c = parcial_do_extrato(meses[-1]["mes"])
+            if c and c["ate"] > meses[-1]["ate"]:
+                print(f"{aba}: {c['origem']} até {c['ate']} (planilha até {meses[-1]['ate']}):")
+                meses[-1].update(mes_do_extrato(c, meses[-2]["saldoConta"]))
 
     # Médias e previsões usam só os meses fechados.
     fechados = [m for m in meses if not m.get("parcial")]
@@ -311,7 +378,8 @@ def main():
     badge = {
         **BADGE,
         "componentes": round(custo_clube, 2),
-        "custoClube": round(custo_clube * (1 + BADGE["frete"]), 2),
+        "custoEstimado": round(custo_clube * (1 + BADGE["frete"]), 2),
+        "custoClube": BADGE["verba"],
         "precoLiquido": round(preco_liquido, 2),
         "receita": {c: round(sum(v.values()) * preco_liquido, 2) for c, v in BADGE["vendas"].items()},
     }
@@ -346,7 +414,7 @@ def main():
     print("receita prevista/mês", receita_mensal, "anuidades confirmadas", anuidades_confirmadas)
     for c, v in previsao_receitas["cenarios"].items():
         print(f"cenário {c}: {sum(v.values()):.2f}/mês, badge receita {badge['receita'][c]:.2f}")
-    print(f"badge custo do clube {badge['custoClube']:.2f}")
+    print(f"badge verba {badge['custoClube']:.2f}, custo estimado {badge['custoEstimado']:.2f}")
     print("Gerado", SAIDA.relative_to(RAIZ))
 
 

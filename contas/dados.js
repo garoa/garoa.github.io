@@ -1,7 +1,7 @@
 // Gerado por scripts/extrair.py — apenas valores agregados por categoria.
 window.DADOS = {
   "ano": 2026,
-  "atualizadoEm": "2026-10-16",
+  "atualizadoEm": "2026-11-08",
   "saldoInicialConta": 5032.47,
   "saldoInicialInvestimentos": 30423.51,
   "meses": [
@@ -210,19 +210,42 @@ window.DADOS = {
     },
     {
       "mes": "2026-10",
-      "parcial": true,
-      "ate": "2026-10-03",
       "receitas": {
-        "Mensalidades (PayPal)": 354.88,
-        "Mensalidades (depósito)": 374.0,
-        "Anuidades": 3148.0
+        "Mensalidades (PayPal)": 709.76,
+        "Mensalidades (depósito)": 962.0,
+        "Anuidades": 5392.0,
+        "Apoia-se": 445.44,
+        "Doações, eventos e lojinha": 147.34
       },
       "despesas": {
-        "Aluguel": 4290.27
+        "Aluguel": 4290.27,
+        "Luz": 130.17,
+        "Contabilidade": 398.2,
+        "Água": 82.89,
+        "Internet": 114.45
       },
       "investimento": 0.0,
       "receitaExtraordinaria": 0.0,
-      "saldoConta": 4945.41,
+      "saldoConta": 7999.36,
+      "saldoInvestimentos": null,
+      "saldoInvestimentosLiquido": null,
+      "observacao": ""
+    },
+    {
+      "mes": "2026-11",
+      "parcial": true,
+      "ate": "2026-11-04",
+      "receitas": {
+        "Mensalidades (PayPal)": 710.37,
+        "Mensalidades (depósito)": 588.0
+      },
+      "despesas": {
+        "Aluguel": 4290.27,
+        "Luz": 144.85
+      },
+      "investimento": 0.0,
+      "receitaExtraordinaria": 0.0,
+      "saldoConta": 4862.61,
       "saldoInvestimentos": null,
       "saldoInvestimentosLiquido": null,
       "observacao": ""
@@ -230,22 +253,11 @@ window.DADOS = {
   ],
   "projecao": [
     {
-      "mes": "2026-10",
-      "despesas": {
-        "Contabilidade": 398.2,
-        "Luz": 126.83,
-        "Água": 81.24,
-        "Internet": 113.19
-      }
-    },
-    {
       "mes": "2026-11",
       "despesas": {
-        "Aluguel": 4290.27,
         "Contabilidade": 398.2,
-        "Luz": 126.83,
-        "Água": 81.24,
-        "Internet": 113.19
+        "Água": 82.89,
+        "Internet": 114.45
       }
     },
     {
@@ -253,9 +265,9 @@ window.DADOS = {
       "despesas": {
         "Aluguel": 3860.6,
         "Contabilidade": 398.2,
-        "Luz": 126.83,
-        "Água": 81.24,
-        "Internet": 113.19
+        "Luz": 127.16,
+        "Água": 82.89,
+        "Internet": 114.45
       }
     }
   ],
@@ -264,28 +276,28 @@ window.DADOS = {
     "despesas": {
       "Aluguel": 3860.6,
       "Contabilidade": 398.2,
-      "Luz": 126.83,
-      "Água": 81.24,
-      "Internet": 113.19
+      "Luz": 127.16,
+      "Água": 82.89,
+      "Internet": 114.45
     }
   },
   "previsaoReceitas": {
     "mensal": {
       "Mensalidades (depósito)": 1095.33,
-      "Mensalidades (PayPal)": 769.11,
+      "Mensalidades (PayPal)": 828.26,
       "Apoia-se": 445.44,
-      "Doações, eventos e lojinha": 578.98
+      "Doações, eventos e lojinha": 535.82
     },
     "mesesBase": [
-      "2026-07",
       "2026-08",
-      "2026-09"
+      "2026-09",
+      "2026-10"
     ],
     "anuidadesConfirmadas": 0.0,
     "cenarios": {
       "pessimista": {
         "Mensalidades (depósito)": 962.0,
-        "Mensalidades (PayPal)": 532.32,
+        "Mensalidades (PayPal)": 709.76,
         "Apoia-se": 445.44,
         "Doações, eventos e lojinha": 0.0
       },
@@ -293,30 +305,31 @@ window.DADOS = {
         "Mensalidades (depósito)": 1162.0,
         "Mensalidades (PayPal)": 1065.25,
         "Apoia-se": 445.44,
-        "Doações, eventos e lojinha": 578.98
+        "Doações, eventos e lojinha": 535.82
       }
     },
     "restanteParcial": {
       "pessimista": {
-        "Mensalidades (depósito)": 588.0,
-        "Mensalidades (PayPal)": 177.44,
+        "Mensalidades (depósito)": 374.0,
+        "Mensalidades (PayPal)": 0.0,
         "Apoia-se": 445.44,
         "Doações, eventos e lojinha": 0.0
       },
       "otimista": {
-        "Mensalidades (depósito)": 788.0,
-        "Mensalidades (PayPal)": 710.37,
+        "Mensalidades (depósito)": 574.0,
+        "Mensalidades (PayPal)": 354.88,
         "Apoia-se": 445.44,
-        "Doações, eventos e lojinha": 578.98
+        "Doações, eventos e lojinha": 535.82
       }
     }
   },
   "badge": {
     "lote": 30,
     "unidadesPagasPeloClube": 20,
+    "verba": 2000.0,
     "custoUnidade": 87.7655,
     "frete": 0.1,
-    "preco": 150.0,
+    "preco": 180.0,
     "taxaCartao": 0.05,
     "eventos": [
       "GambiConf",
@@ -333,11 +346,12 @@ window.DADOS = {
       }
     },
     "componentes": 1755.31,
-    "custoClube": 1930.84,
-    "precoLiquido": 142.5,
+    "custoEstimado": 1930.84,
+    "custoClube": 2000.0,
+    "precoLiquido": 171.0,
     "receita": {
-      "pessimista": 1710.0,
-      "otimista": 4275.0
+      "pessimista": 2052.0,
+      "otimista": 5130.0
     }
   },
   "extratos": {
@@ -351,7 +365,8 @@ window.DADOS = {
         "2026-06",
         "2026-07",
         "2026-08",
-        "2026-09"
+        "2026-09",
+        "2026-10"
       ],
       "investimentos": [
         "2026-01",
@@ -367,12 +382,12 @@ window.DADOS = {
       "colchao": 6000.0,
       "maiorNecessidade": 4888.79,
       "mesMaiorNecessidade": "2026-05",
-      "saldoMedio": 12941.18,
-      "perdaBruta": 761.28,
-      "perdaLiquida": 589.99,
+      "saldoMedio": 12372.63,
+      "perdaBruta": 779.54,
+      "perdaLiquida": 604.14,
       "taxaDiaUtil": 0.0005165470997377588,
       "de": "2026-01",
-      "ate": "2026-09"
+      "ate": "2026-10"
     },
     "aluguelAtrasado": [
       {
